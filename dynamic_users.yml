@@ -1,0 +1,51 @@
+---
+- name: Create multiple users dynamically
+  hosts: all
+  become: true
+  vars:
+    users: []  # Default empty list to be overridden by extra_vars
+
+  tasks:
+    # Create users dynamically
+    - name: Create users
+      user:
+        name: "{{ item }}"
+        state: present
+        create_home: true
+      with_items: "{{ users }}"
+
+    # Set permissions on home directories
+    - name: Set permissions on home directories
+      file:
+        path: "/home/{{ item }}"
+        mode: '0755'
+        state: directory
+      with_items: "{{ users }}"
+
+    # Create public_html directories
+    - name: Create public_html directories
+      file:
+        path: "/home/{{ item }}/public_html"
+        state: directory
+        mode: '0755'
+
+      with_items: "{{ users }}"
+
+    # Upload sample index.html for each user
+    - name: Upload sample index.html to public_html
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Welcome to {{ item }}'s Website</title>
+          </head>
+          <body>
+              <h1>It works!</h1>
+              <p>This is a sample HTML page for {{ item }}.</p>
+          </body>
+          </html>
+        dest: "/home/{{ item }}/public_html/index.html"
+        mode: '0755'
+      with_items: "{{ users }}"
+

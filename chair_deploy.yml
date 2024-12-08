@@ -1,0 +1,47 @@
+---
+- name: Setup user chair and configure public_html
+  hosts: all
+  become: true
+  tasks:
+    # Create user named chair
+    - name: Create user chair
+      user:
+        name: chair
+        state: present
+        create_home: true
+
+    # Set permissions on /home/chair
+    - name: Set permissions on /home/chair
+      file:
+        path: /home/chair
+        mode: '0755'
+        state: directory
+
+    # Create public_html directory (owner: root, group: root)
+    - name: Create public_html directory for chair
+      file:
+        path: /home/chair/public_html
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+    # Upload sample index.html (permissions: 755, owner: root, group: root)
+    - name: Upload sample index.html to public_html
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Welcome to Chair's Website</title>
+          </head>
+          <body>
+              <h1>It works!</h1>
+              <p>This is a sample HTML page.</p>
+          </body>
+          </html>
+        dest: /home/chair/public_html/index.html
+        mode: '0755'
+        owner: root
+        group: root
+

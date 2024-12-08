@@ -1,0 +1,91 @@
+---
+- name: Setup user chair and configure public_html for Ubuntu and Fedora
+  hosts: all
+  become: true
+  tasks:
+    # Tasks for Ubuntu
+    - name: Create user chair on Ubuntu
+      user:
+        name: wall
+        state: present
+        create_home: true
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Set permissions on /home/chair on Ubuntu
+      file:
+        path: /home/wall
+        mode: '0755'
+        state: directory
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Create public_html directory for chair on Ubuntu
+      file:
+        path: /home/wall/public_html
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Upload sample index.html to public_html on Ubuntu
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Welcome to Wall's Website</title>
+          </head>
+          <body>
+              <h1>It works!</h1>
+              <p>This is a sample HTML page for Ubuntu.</p>
+          </body>
+          </html>
+        dest: /home/wall/public_html/index.html
+        mode: '0755'
+        owner: root
+        group: root
+      when: ansible_facts['os_family'] == 'Debian'
+
+    # Tasks for Fedora
+    - name: Create user chair on Fedora
+      user:
+        name: wall
+        state: present
+        create_home: true
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Set permissions on /home/wall on Fedora
+      file:
+        path: /home/wall
+        mode: '0755'
+        state: directory
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Create public_html directory for chair on Fedora
+      file:
+        path: /home/wall/public_html
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Upload sample index.html to public_html on Fedora
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Welcome to Wall's Website</title>
+          </head>
+          <body>
+              <h1>It works!</h1>
+              <p>This is a sample HTML page for Fedora.</p>
+          </body>
+          </html>
+        dest: /home/wall/public_html/index.html
+        mode: '0755'
+        owner: root
+        group: root
+      when: ansible_facts['os_family'] == 'RedHat'
+
